@@ -1,6 +1,5 @@
 ---
-title: "JSE Presentation"
-author: "Susannah Hogue"
+title: "JSE Activity"
 date: "`r Sys.Date()`"
 output: 
   html_document: 
@@ -33,29 +32,30 @@ This activity focuses on the data from Test 2. Test 2 is the only test in which 
 
 #Getting into some statistics
 * *Read in the data set from http://www.amstat.org/publications/jse/v21n1/dunn/batteries2.csv*  
-```{r}
-site <- "http://www.amstat.org/publications/jse/v21n1/dunn/batteries2.csv"
-batteries2 <- read.csv(file = site)
-head(batteries2)
+```{r, eval=FALSE}
+site <- ______________________________________
+batteries2 <- read.csv("______________________________________")
+head(__________)
 ```
 
+
 * *Subset the data by the two different brands of batteries.*  
-```{r}
-bEner2<-batteries2[batteries2$Brand=="Energizer",]
-bUltra2<-batteries2[batteries2$Brand=="Ultracell",]
+```{r,eval = FALSE}
+bEner2<-batteries2[batteries2$Brand=="__________",]
+bUltra2<-batteries2[batteries2$Brand=="__________",]
 ```
 
 * *Calculate the mean, median, and standard deviation of the entire dataset.*  
-```{r}
-b2mean<-with(batteries2, tapply(Time, list(Brand, Voltage), mean))
-b2median<-with(batteries2, tapply(Time, list(Brand, Voltage), median))
-b2sd<-with(batteries2, tapply(Time, list(Brand, Voltage), sd))
+```{r,eval = FALSE}
+b2mean<-with(___________, tapply(Time, list(Brand, Voltage), _________))
+b2median<-with(___________, tapply(Time, list(Brand, Voltage), _________))
+b2sd<-with(___________, tapply(Time, list(Brand, Voltage), __________))
 ```
 
 *Find the ranges of the subsetted datasets for voltage of 0.9.*  
-```{r}
-b2EnerRange<-with(bEner2, tapply(Time, Voltage, range))[2]
-b2UltraRange<-with(bUltra2, tapply(Time, Voltage, range))[2]
+```{r,eval = FALSE}
+b2EnerRange<-with(________, tapply(Time, Voltage, range))[_]
+b2UltraRange<-with(_________, tapply(Time, Voltage, range))[_]
 ```
 
 
@@ -70,13 +70,7 @@ b2UltraRange<-with(bUltra2, tapply(Time, Voltage, range))[2]
 | 3    | 1.05 V      | pulses | **99**    | **89** to **117**    | 70        | 64 to 77         |
 
 
-
-
-
-
-**Table 2.**  The data from Test 2: The times taken (in decimal hours) for nine batteries of two brands (E:
-Energizer; U: Ultracell) to reach specified voltage end-points. The figures in bold are the superior
-lifetime summary averages.
+**Table 2.**  The data from Test 2: The times taken (in decimal hours) for nine batteries of two brands (E: Energizer; U: Ultracell) to reach specified voltage end-points. The figures in bold are the superior lifetime summary averages.
 
 
 |      Volts       | 1.3  |          | 1.2  |          | 1.1  |          | 1.0  |          | 0.9  |      | 0.8  |          |
@@ -95,17 +89,17 @@ lifetime summary averages.
 | **Median**  | 1.36      | **1.54** | 2.73      | **3.54** | 5.63      | **5.72** | 7.46      | **7.48** | **8.34**  | 8.32 | 8.72      | **8.76** |
 | **Std dev** | 0.04      | 0.03     | 0.14      | 0.02     | 0.45      | 0.02     | 0.29      | 0.17     | 0.22      | 0.16 | 0.13      | 0.06     |
 
-
 * *Make a plot of the different brands and the voltage as time increases.*  
-```{r}
+```{r,eval = FALSE}
 library(ggplot2)
 
-ggplot(batteries2, aes(Time, Voltage, color=factor(Brand)))+
+ggplot(batteries2, aes(____, _______, color=factor(Brand)))+
   geom_point(shape=3)+
   geom_jitter(shape=3)+
   theme_bw()+
   theme(legend.title=element_blank())
 ```
+**Figure 1.** A plot of the data from Test 2.
 
 * *What are you first impressions of the relationship between Energizer and Ultracell now that you've seen some data?*  
 
@@ -117,19 +111,19 @@ Here we are conducting a t-test to test the hypothesis of no difference between 
 
 To test the hypothesis of no difference between the mean times to decay to 0.9 volts $(H_0: \mu_U = \mu_E)$ against the two-tailed alternative $(H_A: \mu_U ≠ \mu_E)$, a standard t-test could be used. 
 
-* *Run a t-test.*   
-```{r}
+* *Run a t-test.*  
+```{r,eval = FALSE}
 #Table 4:
 # T-test for a difference at 0.9 V
-p.t <- t.test(Time ~ Brand,
-data=subset(batteries2, Voltage==0.9))
+p.t <- t.test(____ ~ _____, data=subset(batteries2, Voltage==0.9))
 p.t
 ```
 
 ##A bootstrap approach to compare the medians
 
 Here we use the bootstrap approach to compare the medians or means. We are testing: $(H_0: median_U = median_E$ against $H_A: median_U ≠ median_E)$. This code is a little different than code that we've previously used, so it is all provided. *Take a look at the documentation for `boot()` to see how the inputs work. Then you may run the code*
-```{r}
+
+```{r,eval = FALSE}
 # Bootstrap test for a difference at 0.9 V
 med.diff <- function(dataset, ind){
  y <- dataset$Time[ind]
@@ -144,29 +138,18 @@ out <- boot(subset(batteries2, Voltage==0.9), med.diff, R=5000)
 ci.boot <- boot.ci(out)
 p.boot <- sum(out$t >= 0)/out$R
 p.boot
-ci.boot
+ci.boot#the study uses the BCa confidence interval
 ```
+
 Dr. Arnholt says that the bootstrap has problems with Quantiles (ie median) and that it's better to use trimmed mean if you want a robust estimate.
 
 * *Try re-running the bootsrap with the mean instead of the median (You can copy and paste and make necessary adjustments in the code chunk below)*  
 ```{r,eval=FALSE}
 #time to make new and exciting code!
-med.diff <- function(dataset, ind){
- y <- dataset$Time[ind]
- group <- dataset$Brand[ind]
- med.E <- mean(y[group=="Energizer"]) # E
- med.U <- mean(y[group=="Ultracell"]) # U
- return(med.E - med.U)
-}
 
-library(boot) ### LOAD THE boot LIBRARY
-out <- boot(subset(batteries2, Voltage==0.9), med.diff, R=5000)
-ci.boot <- boot.ci(out)
-p.boot <- sum(out$t >= 0)/out$R
-p.boot
-ci.boot
 
 ```
+
 
 | Method                     | P-value | Confidence Interval |
 |----------------------------|---------|---------------------|
@@ -190,11 +173,10 @@ Note that the times for Energizer and Ultracell can also be compared for **all**
 Multiple tests suggest themselves in this scenario as well. The code for an analysis of variance can be completed below.   
 
 * *Run an analysis of variance.*  
-```{r}
+```{r,eval=FALSE}
 #The repeated measures analyses:
 #noting that the experiment is balanced, and treating the voltage levels as factors
-t1 <- aov(Time ~ factor(Voltage)*Brand + Error(Battery),
-data = batteries2)
+t1 <- aov(___ ~ factor(_______)*Brand + Error(Battery),data = __________)
 summary(t1)
 model.tables(t1,"means")
 ```
