@@ -1,0 +1,133 @@
+---
+title: "JSE Presentation"
+author: "Susannah Hogue"
+date: "`r Sys.Date()`"
+output: 
+  html_document: 
+    css: normalize.css
+    highlight: textmate
+    theme: readable
+---
+
+```{r, echo = FALSE}
+library(knitr)
+knitr::opts_chunk$set(comment = NA,fig.width=6,fig.align="center",warning=FALSE, message=FALSE)
+```
+
+
+```{r}
+site <- "http://www.amstat.org/publications/jse/v21n1/dunn/batteries2.csv"
+batteries2 <- read.csv(file = site)
+head(batteries2)
+```
+
+```{r}
+bEner2<-batteries2[batteries2$Brand=="Energizer",]
+bUltra2<-batteries2[batteries2$Brand=="Ultracell",]
+b2mean<-with(batteries2, tapply(Time, list(Brand, Voltage), mean))
+b2median<-with(batteries2, tapply(Time, list(Brand, Voltage), median))
+b2sd<-with(batteries2, tapply(Time, list(Brand, Voltage), sd))
+b2EnerRange<-with(bEner2, tapply(Time, Voltage, range))[2]
+b2UltraRange<-with(bUltra2, tapply(Time, Voltage, range))[2]
+```
+
+
+
+**Table 1.** The summary of the results from the three tests on the two brands of batteries. Figures in bold indicate the superior results.
+
+|      |             |        | Ultracell |                      | Energizer |                  |
+|------|-------------|--------|-----------|----------------------|-----------|------------------|
+| Test | End Voltage | Units  | Mean      | Range                | Mean      | Range            |
+| 1    | 0.9 V       | pulses | **574**   | **540** to **584**   | 403       | 276 to 467       |
+| 2    | 0.9 V       | hours  | 8.24      | **7.93** to 8.35     | **8.28**  | 7.88 to **8.49** |
+| 3    | 1.05 V      | pulses | **99**    | **89** to **117**    | 70        | 64 to 77         |
+
+
+
+
+
+
+**Table 2.**  The data from Test 2: The times taken (in decimal hours) for nine batteries of two brands (E:
+Energizer; U: Ultracell) to reach specified voltage end-points. The figures in bold are the superior
+lifetime summary averages.
+
+
+|      Volts       | 1.3  |          | 1.2  |          | 1.1  |          | 1.0  |          | 0.9  |      | 0.8  |          |
+|-------------|-----------|----------|-----------|----------|-----------|----------|-----------|----------|-----------|------|-----------|----------|
+|             | **E**         | **U**        | **E**         | **U**        | **E**         | **U**        | **E**         | **U**        | **E**         | **U**    | **E**         | **U**        |
+|             | 1.40      | 1.56     | 2.86      | 3.57     | 5.71      | 5.76     | 7.58      | 7.50     | 8.45      | 8.35 | 8.86      | 8.76     |
+|             | 1.39      | 1.54     | 2.77      | 3.55     | 5.64      | 5.73     | 7.46      | 7.48     | 8.34      | 8.35 | 8.65      | 8.81     |
+|             | 1.35      | 1.53     | 2,71      | 3.55     | 5.63      | 5.74     | 7.46      | 7.47     | 8.35      | 8.32 | 9.74      | 8.81     |
+|             | 1.38      | 1.54     | 2.81      | 3.54     | 5.78      | 5.71     | 7.59      | 7.48     | 8.49      | 8.32 | 8.91      | 8.70     |
+|             | 1.35      | 1.54     | 2.65      | 3.54     | 5.63      | 5.72     | 7.46      | 7.48     | 8.33      | 8.31 | 8.72      | 8.73     |
+|             | 1.36      | 1.47     | 2.73      | 3.51     | 5.70      | 5.72     | 7.52      | 7.41     | 8.41      | 8.28 | 8.85      | 8.76     |
+|             | 1.31      | 1.49     | 2.48      | 3.54     | 4.65      | 5.71     | 6.83      | 7.47     | 7.88      | 7.99 | 8.52      | 8.68     |
+|             | 1.26      | 1.54     | 2.44      | 3.54     | 4.67      | 5.68     | 6.89      | 6.96     | 7.94      | 7.93 | 8.62      | 8.64     |
+|             | 1.37      | 1.50     | 2.76      | 3.56     | 5.57      | 5.74     | 7.45      | 7.48     | 8.32      | 8.34 | 8.68      | 8.79     |
+| **Mean**    | 1.43      | **1.52** | 2.69      | **3.54** | 5.44      | **5.73** | 7.36      | **7.41** | **8.28**  | 8.24 | 8.73      | **8.74**     |
+| **Median**  | 1.36      | **1.54** | 2.73      | **3.54** | 5.63      | **5.72** | 7.46      | **7.48** | **8.34**  | 8.32 | 8.72      | **8.76** |
+| **Std dev** | 0.04      | 0.03     | 0.14      | 0.02     | 0.45      | 0.02     | 0.29      | 0.17     | 0.22      | 0.16 | 0.13      | 0.06     |
+
+
+```{r}
+library(ggplot2)
+
+ggplot(batteries2, aes(Time, Voltage, color=factor(Brand)))+
+  geom_point(shape=3)+
+  geom_jitter(shape=3)+
+  theme_bw()+
+  theme(legend.title=element_blank())
+```
+
+The purpose of the original study was to compare the lifetime of two battery brands, but deciding the superior lifetime between the brands is actually more difficult than it initially seems. It's important to note that a variety of  methods could also be used to make this comparison. Some of these methods are illustrated below. I did not alter the wording/descriptions of these tests from the article that this project is based on.
+
+Here we are conducting the t-test to test the hypothesis of no difference between the mean times to decay to 0.9 volts $(H_0: \mu_U = \mu_E)$ against the two-tailed alternative $(H_A: \mu_U ≠ \mu_E)$.
+
+
+1. Suppose that we are only concerned with the 0.9 volts end-point (though similar issues arise if a different end-point is chosen). To test the hypothesis of no difference between the mean times to decay to 0.9 volts $(H_0: \mu_U = \mu_E)$ against the two-tailed alternative $(H_A: \mu_U ≠ \mu_E)$, a standard t-test could be used. 
+```{r}
+#Table 4:
+# T-test for a difference at 0.9 V
+p.t <- t.test(Time ~ Brand,
+data=subset(batteries2, Voltage==0.9))
+p.t
+```
+
+2. A bootstrap approach to compare the medians
+
+Here we use the bootstrap approach to compare the medians or means. We are testing: $(H_0: median_U = median_E$ against $H_A: median_U ≠ median_E)$.
+```{r}
+# Bootstrap test for a difference at 0.9 V
+med.diff <- function(dataset, ind){
+ y <- dataset$Time[ind]
+ group <- dataset$Brand[ind]
+ med.E <- median(y[group=="Energizer"]) # E
+ med.U <- median(y[group=="Ultracell"]) # U
+ return(med.E - med.U)
+}
+
+library(boot) ### LOAD THE boot LIBRARY
+out <- boot(subset(batteries2, Voltage==0.9), med.diff, R=5000)
+ci.boot <- boot.ci(out)
+p.boot <- sum(out$t >= 0)/out$R
+p.boot
+ci.boot
+```
+
+3. Permutation test
+Here we conduct a permutation test.We are testing: $(H_0: mean_U = mean_E$ against $H_A: mean_U ≠ mean_E)$.
+```{r}
+out.perm <- aov(Time~Brand, data=subset(batteries2, Voltage==0.9))
+summary(out.perm)
+confint(out.perm,level=.95)
+
+source("http://rcompanion.org/r_script/pairwise.permutation.test.r")
+pairwise.permutation.test(batteries2$Time,batteries2$Brand,method="fdr")
+
+```
+
+| Method                     | P-value | Confidence Interval |
+|----------------------------|---------|---------------------|
+| t-test                     | 0.70    | -0.16 to 0.23       |
+| Bootstrap                  | 0.89    | -0.40 to 0.10       |
+| Permutation test for means | 0.64    | -0.08 to 0.11       |
