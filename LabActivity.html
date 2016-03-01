@@ -388,11 +388,11 @@ ggplot(batteries2, aes(____, _______, color=factor(Brand)))+
 <li><em>What are you first impressions of the relationship between Energizer and Ultracell now that you’ve seen some data?</em></li>
 </ul>
 </div>
-<div id="methods" class="section level1">
-<h1>Methods</h1>
+<div id="methods-of-comparison" class="section level1">
+<h1>Methods of comparison</h1>
 <p>The purpose of the original study was to compare the lifetime of two battery brands, but deciding the superior lifetime between the brands is actually more difficult than it initially seems. It’s important to note that a variety of methods could also be used to make this comparison. Some of these methods are illustrated below. Suppose that we are only concerned with the 0.9 volts end-point (though similar issues arise if a different end-point is chosen).</p>
-<div id="t-test" class="section level2">
-<h2>T-Test</h2>
+<div id="t-test" class="section level3">
+<h3>T-Test</h3>
 <p>Here we are conducting a t-test to test the hypothesis of no difference between the mean times to decay to 0.9 volts <span class="math">\((H_0: \mu_U = \mu_E)\)</span> against the two-tailed alternative <span class="math">\((H_A: \mu_U ≠ \mu_E)\)</span>.</p>
 <p>To test the hypothesis of no difference between the mean times to decay to 0.9 volts <span class="math">\((H_0: \mu_U = \mu_E)\)</span> against the two-tailed alternative <span class="math">\((H_A: \mu_U ≠ \mu_E)\)</span>, a standard t-test could be used.</p>
 <ul>
@@ -403,8 +403,8 @@ ggplot(batteries2, aes(____, _______, color=factor(Brand)))+
 p.t &lt;- t.test(____ ~ _____, data=subset(batteries2, Voltage==0.9))
 p.t</code></pre>
 </div>
-<div id="a-bootstrap-approach-to-compare-the-medians" class="section level2">
-<h2>A bootstrap approach to compare the medians</h2>
+<div id="a-bootstrap-approach-to-compare-the-medians" class="section level3">
+<h3>A bootstrap approach to compare the medians</h3>
 <p>Here we use the bootstrap approach to compare the medians or means. We are testing: <span class="math">\((H_0: median_U = median_E\)</span> against <span class="math">\(H_A: median_U ≠ median_E)\)</span>. This code is a little different than code that we’ve previously used, so it is all provided. <em>Take a look at the documentation for <code>boot()</code> to see how the inputs work. Then you may run the code</em></p>
 <pre class="r"><code># Bootstrap test for a difference at 0.9 V
 med.diff &lt;- function(dataset, ind){
@@ -421,6 +421,9 @@ ci.boot &lt;- boot.ci(out)
 p.boot &lt;- sum(out$t &gt;= 0)/out$R
 p.boot
 ci.boot#the study uses the BCa confidence interval</code></pre>
+</div>
+<div id="a-bootstrap-approach-to-compare-the-means" class="section level3">
+<h3>A bootstrap approach to compare the means</h3>
 <p>Dr. Arnholt says that the bootstrap has problems with Quantiles (ie median) and that it’s better to use trimmed mean if you want a robust estimate.</p>
 <ul>
 <li><em>Try re-running the bootsrap with the mean instead of the median (You can copy and paste and make necessary adjustments in the code chunk below)</em></li>

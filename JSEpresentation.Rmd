@@ -8,7 +8,7 @@ output:
     highlight: textmate
     theme: readable
 ---
-
+Where to go: https://github.com/hoguesj/sharingIScaring
 
 ```{r, echo = FALSE}
 library(knitr)
@@ -109,10 +109,10 @@ ggplot(batteries2, aes(Time, Voltage, color=factor(Brand)))+
 
 * *What are you first impressions of the relationship between Energizer and Ultracell now that you've seen some data?*  
 
-#Methods
+#Methods of comparison
 The purpose of the original study was to compare the lifetime of two battery brands, but deciding the superior lifetime between the brands is actually more difficult than it initially seems. It's important to note that a variety of  methods could also be used to make this comparison. Some of these methods are illustrated below. Suppose that we are only concerned with the 0.9 volts end-point (though similar issues arise if a different end-point is chosen).
 
-##T-Test
+###T-Test
 Here we are conducting a t-test to test the hypothesis of no difference between the mean times to decay to 0.9 volts $(H_0: \mu_U = \mu_E)$ against the two-tailed alternative $(H_A: \mu_U ≠ \mu_E)$.
 
 To test the hypothesis of no difference between the mean times to decay to 0.9 volts $(H_0: \mu_U = \mu_E)$ against the two-tailed alternative $(H_A: \mu_U ≠ \mu_E)$, a standard t-test could be used. 
@@ -126,7 +126,7 @@ data=subset(batteries2, Voltage==0.9))
 p.t
 ```
 
-##A bootstrap approach to compare the medians
+###A bootstrap approach to compare the medians
 
 Here we use the bootstrap approach to compare the medians or means. We are testing: $(H_0: median_U = median_E$ against $H_A: median_U ≠ median_E)$. This code is a little different than code that we've previously used, so it is all provided. *Take a look at the documentation for `boot()` to see how the inputs work. Then you may run the code*
 ```{r}
@@ -146,6 +146,8 @@ p.boot <- sum(out$t >= 0)/out$R
 p.boot
 ci.boot
 ```
+
+###A bootstrap approach to compare the means
 Dr. Arnholt says that the bootstrap has problems with Quantiles (ie median) and that it's better to use trimmed mean if you want a robust estimate.
 
 * *Try re-running the bootsrap with the mean instead of the median (You can copy and paste and make necessary adjustments in the code chunk below)*  
@@ -184,7 +186,7 @@ ALDI claims that the Ultracell batteries outperform Energizer batteries in two t
 
 * *How would you explain the situation to the person with little statistical knowledge if they had seen the results of table 1?*  
 
-##Testing in an overall sense
+###Testing in an overall sense
 Note that the times for Energizer and Ultracell can also be compared for **all** the given voltage levels. It may actually end up being more useful to test whether one brand of battery is superior to the other in an overall sense and not just at a specific voltage.
 
 Multiple tests suggest themselves in this scenario as well. The code for an analysis of variance can be completed below.   
