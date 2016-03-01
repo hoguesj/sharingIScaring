@@ -7,7 +7,7 @@ output:
     highlight: textmate
     theme: readable
 ---
-
+Where to go: https://github.com/hoguesj/sharingIScaring
 
 ```{r, echo = FALSE}
 library(knitr)
