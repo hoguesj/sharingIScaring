@@ -1,0 +1,202 @@
+---
+title: "Revised JSE Lab Solutions"
+date: "`r Sys.Date()`"
+output: 
+  html_document: 
+    css: normalize.css
+    highlight: textmate
+    theme: readable
+---
+Where to go: https://github.com/hoguesj/sharingIScaring
+
+```{r, echo = FALSE}
+library(knitr)
+knitr::opts_chunk$set(comment = NA,fig.width=6,fig.align="center",warning=FALSE, message=FALSE)
+```
+#Introduction to claims and data
+This activity presents three related datasets on battery life that are easy for students to understand. Research had previously been done on these datasets, and it had been concluded that Ultracell AA Alkaline (ALDI battery brand brand) batteries outperformed the Energizer Max AA Alkaline batteries.
+
+The following tests were conducted each using 9 batteries from each brand:  
+
+  1. Batteries were loaded with a camera flash, using 1000 m A loaded for 10 s/min for one hour per day. The number of “pulses” to reach pre-defined voltage levels was recorded. 
+
+  2. Batteries were loaded using a 250 m A electronic game for one hour per day.
+  The time taken to reach pre-defined voltage levels was recorded. 
+
+  3. Batteries were loaded with a digital camera drawing 1500 m W / 650 m W, for 2s every 28 s, for 5 min/h   for 24 hours/day. The number of “pulses” to reach pre-defined voltage levels was recorded.
+
+This activity focuses on the data from Test 2. Test 2 is the only test in which ALDI did not claim their batteries were superior to Energizer.
+
+* *Do you have any personal experiences that make you think one brand would be better than the other?*  
+
+```
+I've never really thought about it before.
+```
+
+#Getting into some statistics
+
+Here I will read in the data set from the third test as an example:
+```{r}
+site <- "http://www.amstat.org/publications/jse/v21n1/dunn/batteries3.csv"
+batteries3 <- read.csv(file = site)
+head(batteries3)
+```
+
+* *Read in the data set from the second test using this url: http://www.amstat.org/publications/jse/v21n1/dunn/batteries2.csv*  
+
+```{r, eval=FALSE}
+#Your code here
+site <- "http://www.amstat.org/publications/jse/v21n1/dunn/batteries2.csv"
+batteries2 <- read.csv(file = site)
+head(batteries2)
+```
+
+* *Subset the data by the two different brands of batteries.*  
+```{r,eval = FALSE}
+#Your code here
+bEner2<-batteries2[batteries2$Brand=="Energizer",]
+bUltra2<-batteries2[batteries2$Brand=="Ultracell",]
+```
+
+* *Calculate the mean, median, and standard deviation of the entire dataset.*  
+```{r,eval = FALSE}
+#Your code here
+b2mean<-with(batteries2, tapply(Time, list(Brand, Voltage), mean))
+b2median<-with(batteries2, tapply(Time, list(Brand, Voltage), median))
+b2sd<-with(batteries2, tapply(Time, list(Brand, Voltage), sd))
+```
+
+*Find the ranges of the subsetted datasets for voltage of 0.9.*  
+```{r,eval = FALSE}
+#Your code here
+b2EnerRange<-with(bEner2, tapply(Time, Voltage, range))[2]
+b2UltraRange<-with(bUltra2, tapply(Time, Voltage, range))[2]
+```
+
+
+
+**Table 1.** The summary of the results from the three tests on the two brands of batteries. Figures in bold indicate the superior results.
+
+|      |             |        | Ultracell |                      | Energizer |                  |
+|------|-------------|--------|-----------|----------------------|-----------|------------------|
+| Test | End Voltage | Units  | Mean      | Range                | Mean      | Range            |
+| 1    | 0.9 V       | pulses | **574**   | **540** to **584**   | 403       | 276 to 467       |
+| 2    | 0.9 V       | hours  | 8.24      | **7.93** to 8.35     | **8.28**  | 7.88 to **8.49** |
+| 3    | 1.05 V      | pulses | **99**    | **89** to **117**    | 70        | 64 to 77         |
+
+
+**Table 2.**  The data from Test 2: The times taken (in decimal hours) for nine batteries of two brands (E: Energizer; U: Ultracell) to reach specified voltage end-points. The figures in bold are the superior lifetime summary averages.
+
+
+|      Volts       | 1.3  |          | 1.2  |          | 1.1  |          | 1.0  |          | 0.9  |      | 0.8  |          |
+|-------------|-----------|----------|-----------|----------|-----------|----------|-----------|----------|-----------|------|-----------|----------|
+|             | **E**         | **U**        | **E**         | **U**        | **E**         | **U**        | **E**         | **U**        | **E**         | **U**    | **E**         | **U**        |
+|             | 1.40      | 1.56     | 2.86      | 3.57     | 5.71      | 5.76     | 7.58      | 7.50     | 8.45      | 8.35 | 8.86      | 8.76     |
+|             | 1.39      | 1.54     | 2.77      | 3.55     | 5.64      | 5.73     | 7.46      | 7.48     | 8.34      | 8.35 | 8.65      | 8.81     |
+|             | 1.35      | 1.53     | 2,71      | 3.55     | 5.63      | 5.74     | 7.46      | 7.47     | 8.35      | 8.32 | 9.74      | 8.81     |
+|             | 1.38      | 1.54     | 2.81      | 3.54     | 5.78      | 5.71     | 7.59      | 7.48     | 8.49      | 8.32 | 8.91      | 8.70     |
+|             | 1.35      | 1.54     | 2.65      | 3.54     | 5.63      | 5.72     | 7.46      | 7.48     | 8.33      | 8.31 | 8.72      | 8.73     |
+|             | 1.36      | 1.47     | 2.73      | 3.51     | 5.70      | 5.72     | 7.52      | 7.41     | 8.41      | 8.28 | 8.85      | 8.76     |
+|             | 1.31      | 1.49     | 2.48      | 3.54     | 4.65      | 5.71     | 6.83      | 7.47     | 7.88      | 7.99 | 8.52      | 8.68     |
+|             | 1.26      | 1.54     | 2.44      | 3.54     | 4.67      | 5.68     | 6.89      | 6.96     | 7.94      | 7.93 | 8.62      | 8.64     |
+|             | 1.37      | 1.50     | 2.76      | 3.56     | 5.57      | 5.74     | 7.45      | 7.48     | 8.32      | 8.34 | 8.68      | 8.79     |
+| **Mean**    | 1.43      | **1.52** | 2.69      | **3.54** | 5.44      | **5.73** | 7.36      | **7.41** | **8.28**  | 8.24 | 8.73      | **8.74**     |
+| **Median**  | 1.36      | **1.54** | 2.73      | **3.54** | 5.63      | **5.72** | 7.46      | **7.48** | **8.34**  | 8.32 | 8.72      | **8.76** |
+| **Std dev** | 0.04      | 0.03     | 0.14      | 0.02     | 0.45      | 0.02     | 0.29      | 0.17     | 0.22      | 0.16 | 0.13      | 0.06     |
+
+Here is an example of a scatter plot between the different brands and the voltage as the number of pulses increases:
+```{r,eval = FALSE}
+library(ggplot2)
+
+ggplot(batteries3, aes(Pulses, Voltage, color=factor(Brand)))+
+  geom_point(shape=3)+
+  geom_jitter(shape=3)+
+  theme_bw()+
+  theme(legend.title=element_blank())
+```
+
+Looking at the information provided in the second test, we are interested in looking at how voltage is effected as the amount of time that the battery is used increases.
+
+* *Make a plot of the different brands and the voltage as time increases. Make sure you load any packages that you would like to use.*  
+```{r,eval = FALSE}
+#Your code here
+library(ggplot2)
+
+ggplot(batteries2, aes(Time, Voltage, color=factor(Brand)))+
+  geom_point(shape=3)+
+  geom_jitter(shape=3)+
+  theme_bw()+
+  theme(legend.title=element_blank())
+```
+**Figure 1.** A plot of the data from Test 2.
+
+* *What are you first impressions of the relationship between Energizer and Ultracell now that you've seen some data?* 
+
+```
+It appears that Ultracell is better than Energizer.
+```
+
+* *How could we test the difference between the two brands with the data from the second test?*
+
+```
+We could use any type of hypothesis tests that test for a difference of means: t-test, bootstrap, ANOVA.
+```
+
+#Methods of comparison
+The purpose of the original study was to compare the lifetime of two battery brands, but deciding the superior lifetime between the brands is actually more difficult than it initially seems. It's important to note that a variety of  methods could also be used to make this comparison. One of these methods is illustrated below. Suppose that we are only concerned with the 0.9 volts end-point (though similar issues arise if a different end-point is chosen).
+
+###T-Test
+Here we are conducting a t-test to test the hypothesis of no difference between the mean times to decay to 0.9 volts.
+
+* *What are the null and alternative hypotheses?*  
+
+$(H_0: \mu_U = \mu_E)$ 
+$(H_A: \mu_U ≠ \mu_E)$.
+
+
+
+To test the hypothesis of no difference between the mean pulses it takes for the batteries to decay to 0.9 volts $(H_0: \mu_U = \mu_E)$ against the two-tailed alternative $(H_A: \mu_U ≠ \mu_E)$, a standard t-test could be used. 
+```{r,eval = FALSE}
+#Table 4:
+# T-test for a difference at 0.9 V
+p.t <- t.test(Pulses ~ Brand, data=subset(batteries3, Voltage==0.9))
+p.t
+```
+* *What does this tell us about the difference between the two brands?*  
+
+```
+We reject the null hypothesis in this scenario. There is a difference in the mean number of pulses it takes for each brand of battery to decay to 0.9 volts.
+```
+
+* *Run a t-test to test the null and alternative hypothesis that you described.*
+```{r,eval = FALSE}
+#Your code here
+p.t2 <- t.test(Time ~ Brand, data=subset(batteries2, Voltage==0.9))
+p.t2
+```
+
+* *How to we make sense of these results? Do we reject or fail to reject the null hypothesis?*  
+
+```
+We fail to reject the null hypothesis in this scenario. There is no difference in the mean time it takes for each brand of battery to decay to 0.9 volts.
+```
+
+ALDI claims that the Ultracell batteries outperform Energizer batteries in two tests (test 1 and 3... the ones that we're not working with). However, they do not mention the fact that no evidence suggests that Energizer batteries outperform Ultracell batteries in any of the three tests.
+
+* *Is the ALDI claim accurate or not?*  
+
+```
+Yes, but it is not as specific as it could be.
+```
+
+* *Could the claim could be worded differently for marketing purposes?*  
+
+```
+Yes, it could say that there is no evidence that Energizer batteries last longer on average in any of the three standard tests.
+```
+
+* *How would you explain the situation to the person with little statistical knowledge if they had seen the results of table 1?*  
+
+```
+First I would probably explain what exactly a p-value is. "The p-value is the probability of obtaining at least as extreme results given that the null hypothesis is true." This would then allow me to elaborate on the results of the t-test. From the p-value obtained through the t-test, we end up concluding that not enough evidence is available to suggest the null is false at chosen alpha level. This means that there is not enough evidence available to indicate a difference in the two brands, so the results for test 2 that are shown in the table are misleading.
+```

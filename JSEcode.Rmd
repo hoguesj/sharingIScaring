@@ -1,0 +1,382 @@
+---
+title: "JSE Project"
+author: "Susannah Hogue"
+date: "`r Sys.Date()`"
+output: 
+  html_document: 
+    css: normalize.css
+    highlight: textmate
+    theme: readable
+---
+
+```{r, echo = FALSE}
+library(knitr)
+knitr::opts_chunk$set(comment = NA,fig.width=6,fig.align="center",warning=FALSE, message=FALSE)
+```
+
+##Introduction to Claims and Data
+This article presents three related datasets on battery life that are easy for students to understand. Research had previously been done on these datasets, and it had been concluded that Ultracell AA Alkaline (ALDI battery brand brand) batteries outperformed the Energizer Max AA Alkaline batteries.
+
+The following tests were conducted each using 9 batteries from each brand:  
+
+  1. Batteries were loaded with a camera flash, using 1000 m A loaded for 10 s/min for one hour per day.     The number of “pulses” to reach pre-defined voltage levels was recorded. 
+
+  2. Batteries were loaded using a 250 m A electronic game for one hour per day.
+  The time taken to reach pre-defined voltage levels was recorded. 
+
+  3. Batteries were loaded with a digital camera drawing 1500 m W / 650 m W, for 2s every 28 s, for 5 min/h   for 24 hours/day. The number of “pulses” to reach pre-defined voltage levels was recorded.
+
+This article focuses on the data from Test 2, and this project will do the same. Test 2 is the only test in which ALDI did not claim their batteries were superior to Energizer.
+
+*Before introducing the data to students, I would ask them to form their own opinions on which batteries they think would last the longest and why. Does something from their personal experience make them think one will be better than the other? What sorts of variations they would expect to see between brands? This will get them thinking critically about the data that we are using.*
+
+The following code loads each of the three datasets associated with each test.  
+```{r}
+site <- "http://www.amstat.org/publications/jse/v21n1/dunn/batteries1.csv"
+batteries1 <- read.csv(file = site)
+head(batteries1)
+
+site <- "http://www.amstat.org/publications/jse/v21n1/dunn/batteries2.csv"
+batteries2 <- read.csv(file = site)
+head(batteries1)
+
+site <- "http://www.amstat.org/publications/jse/v21n1/dunn/batteries3.csv"
+batteries3 <- read.csv(file = site)
+head(batteries1)
+```
+
+*When introducing students to the datasets, it would be nice to have them calculate some basic statistics on the data. Have them find the means and ranges for each brand within each test. Then have them make a table of their findings, so they can easily identify trends. Since we are working with the data from test 2, have them find the mean, median, and standard deviation for that data.*
+
+The code for the results found in Table 1 is shown below:
+```{r}
+#The summaries in Table 1 and 2:
+#Test 1 data:
+bEner1<-batteries1[batteries1$Brand=="Energizer",]
+bUltra1<-batteries1[batteries1$Brand=="Ultracell",]
+b1mean<-with(batteries1, tapply(Pulses, list(Brand, Voltage), mean))
+b1EnerRange<-with(bEner1, tapply(Pulses, Voltage, range))[2]
+b1UltraRange<-with(bUltra1, tapply(Pulses, Voltage, range))[2]
+#Test 2 data:
+bEner2<-batteries2[batteries2$Brand=="Energizer",]
+bUltra2<-batteries2[batteries2$Brand=="Ultracell",]
+b2mean<-with(batteries2, tapply(Time, list(Brand, Voltage), mean))
+b2median<-with(batteries2, tapply(Time, list(Brand, Voltage), median))
+b2sd<-with(batteries2, tapply(Time, list(Brand, Voltage), sd))
+b2EnerRange<-with(bEner2, tapply(Time, Voltage, range))[2]
+b2UltraRange<-with(bUltra2, tapply(Time, Voltage, range))[2]
+#Test 3 data:
+bEner3<-batteries3[batteries3$Brand=="Energizer",]
+bUltra3<-batteries3[batteries3$Brand=="Ultracell",]
+b3mean<-with(batteries3, tapply(Pulses, list(Brand, Voltage), mean))[1,]
+b3EnerRange<-with(bEner3, tapply(Pulses, Voltage, range))[2]
+b3UltraRange<-with(bUltra3, tapply(Pulses, Voltage, range))[2]
+```
+
+**Table 1.** The summary of the results from the three tests on the two brands of batteries. Figures in bold indicate the superior results.
+
+|      |             |        | Ultracell |                      | Energizer |                  |
+|------|-------------|--------|-----------|----------------------|-----------|------------------|
+| Test | End Voltage | Units  | Mean      | Range                | Mean      | Range            |
+| 1    | 0.9 V       | pulses | **574**   | **540** to **584**   | 403       | 276 to 467       |
+| 2    | 0.9 V       | hours  | 8.24      | **7.93** to 8.35     | **8.28**  | 7.88 to **8.49** |
+| 3    | 1.05 V      | pulses | **99**    | **89** to **117**    | 70        | 64 to 77         |
+
+
+Based on means and ranges alone, we can begin to identify that Ultracell may be superior to Energizer.  
+
+*Once we have the results shown in a table, it would be nice to get a conversation going among students. Have them talk about whether the differences between Ultracell and Energizer are indicative of actual differences, or random chance. How could we determine whether these results are **statistically significant**?*
+
+
+**Table 2.**  The data from Test 2: The times taken (in decimal hours) for nine batteries of two brands (E:
+Energizer; U: Ultracell) to reach specified voltage end-points. The figures in bold are the superior
+lifetime summary averages.
+
+
+|      Volts       | 1.3  |          | 1.2  |          | 1.1  |          | 1.0  |          | 0.9  |      | 0.8  |          |
+|-------------|-----------|----------|-----------|----------|-----------|----------|-----------|----------|-----------|------|-----------|----------|
+|             | **E**         | **U**        | **E**         | **U**        | **E**         | **U**        | **E**         | **U**        | **E**         | **U**    | **E**         | **U**        |
+|             | 1.40      | 1.56     | 2.86      | 3.57     | 5.71      | 5.76     | 7.58      | 7.50     | 8.45      | 8.35 | 8.86      | 8.76     |
+|             | 1.39      | 1.54     | 2.77      | 3.55     | 5.64      | 5.73     | 7.46      | 7.48     | 8.34      | 8.35 | 8.65      | 8.81     |
+|             | 1.35      | 1.53     | 2,71      | 3.55     | 5.63      | 5.74     | 7.46      | 7.47     | 8.35      | 8.32 | 9.74      | 8.81     |
+|             | 1.38      | 1.54     | 2.81      | 3.54     | 5.78      | 5.71     | 7.59      | 7.48     | 8.49      | 8.32 | 8.91      | 8.70     |
+|             | 1.35      | 1.54     | 2.65      | 3.54     | 5.63      | 5.72     | 7.46      | 7.48     | 8.33      | 8.31 | 8.72      | 8.73     |
+|             | 1.36      | 1.47     | 2.73      | 3.51     | 5.70      | 5.72     | 7.52      | 7.41     | 8.41      | 8.28 | 8.85      | 8.76     |
+|             | 1.31      | 1.49     | 2.48      | 3.54     | 4.65      | 5.71     | 6.83      | 7.47     | 7.88      | 7.99 | 8.52      | 8.68     |
+|             | 1.26      | 1.54     | 2.44      | 3.54     | 4.67      | 5.68     | 6.89      | 6.96     | 7.94      | 7.93 | 8.62      | 8.64     |
+|             | 1.37      | 1.50     | 2.76      | 3.56     | 5.57      | 5.74     | 7.45      | 7.48     | 8.32      | 8.34 | 8.68      | 8.79     |
+| **Mean**    | 1.43      | **1.52** | 2.69      | **3.54** | 5.44      | **5.73** | 7.36      | **7.41** | **8.28**  | 8.24 | 8.73      | **8.74**     |
+| **Median**  | 1.36      | **1.54** | 2.73      | **3.54** | 5.63      | **5.72** | 7.46      | **7.48** | **8.34**  | 8.32 | 8.72      | **8.76** |
+| **Std dev** | 0.04      | 0.03     | 0.14      | 0.02     | 0.45      | 0.02     | 0.29      | 0.17     | 0.22      | 0.16 | 0.13      | 0.06     |
+
+
+```{r}
+#Figure 1:
+offset <- c(0.01, -0.01)
+plot( Voltage+jitter(ifelse(Brand=="Energizer",offset[1], offset[2]),
+amount=0.01)~Time,
+ main="Test 2",
+ pch=ifelse(Brand=="Energizer",3,4),
+ col=ifelse(Brand=="Energizer","red","blue"),
+ xlab="Time (in hours)", ylab="Voltage",las=1,data=batteries2)
+grid()
+abline(h=0.9, col="gray")
+legend("topright",pch=c(3,4), col=c("red","blue"),
+ legend=c("Energizer","Ultracell"), bty="n")
+
+library(ggplot2)
+
+ggplot(batteries2, aes(Time, Voltage, color=factor(Brand)))+
+  geom_point(shape=3)+
+  geom_jitter(shape=3)+
+  theme_bw()+
+  theme(legend.title=element_blank())
+
+```
+
+**Figure 1.** A plot of the data from Test 2. The solid, gray horizontal line corresponds to the standard end-point for the test: 0.9 volts.
+
+```{r}
+#Figure 2:
+plot(c(0.5,9), c(1,19),
+ type="n",
+ xlab="Time (in hours)",
+ ylab="Battery ID",
+ axes=FALSE,
+ main="Lifetime of batteries until various voltage
+ levels\nare reached, for each battery"
+)
+axis(side=1)
+axis(side=2,
+ at=c( 1:19),
+ labels=c(as.character(1:9), "", as.character(1:9)),
+ las=1
+)
+box()
+text(0.75, 5, "Energizer", srt=90)
+text(0.75, 15, "Ultracell", srt=90)
+text.labels <- rev( levels(as.factor(batteries2$Voltage)) )
+attach(batteries2)
+for (i in (1:9)){
+ lines( Time[Brand=="Energizer" & Battery==i], rep(i,6),
+ col="gray" , lty=1 )
+ points(Time[Brand=="Energizer" & Battery==i], rep(i,6),
+ col="white", cex=3.5, pch=19 )
+ text(Time[Brand=="Energizer" & Battery==i], rep(i,6),
+ labels=text.labels, cex=0.75 )
+}
+for (i in (11:19)){
+ lines( Time[Brand=="Ultracell" & Battery==(i-10)], rep(i,6),
+ col="gray", lty=1 )
+ points(Time[Brand=="Ultracell" & Battery==(i-10)], rep(i,6),
+ col="white", cex=3.5, pch=19 )
+ text(Time[Brand=="Ultracell" & Battery==(i-10)], rep(i,6),
+ labels=text.labels, cex=0.75 )
+}
+detach(batteries2)
+```
+
+**Figure 2.** A plot of the data from Test 2. The plot shows the times for each individual battery to reach each voltage end-point.
+
+##Addressing the Claims made from Test 2
+
+*At this point students should begin to question the reliability of the tests that were done. The mean decay times of the Ultracell batteries are greater at every voltage level except 0.9 volts. The three tests only use 0.9 volts as the test end-point for which to make decisions. Does this fairly represent the comparison between the brands of batteries? Can the students think of alternate approaches to this technique?*
+
+The purpose of the original study was to compare the lifetime of two battery brands, but deciding the superior lifetime between the brands is actually more difficult than it initially seems. It's important to note that a variety of  methods could also be used to make this comparison. Some of these methods are illustrated below. I did not alter the wording/descriptions of these tests from the article that this project is based on.
+
+1. Suppose that we are only concerned with the 0.9 volts end-point (though similar issues arise if a different end-point is chosen). To test the hypothesis of no difference between the mean times to decay to 0.9 volts $(H_0: \mu_U = \mu_E)$ against the two-tailed alternative $(H_A: \mu_U ≠ \mu_E)$, a standard t-test could be used. 
+
+2. A non-parametric test for comparing the medians $(H_0: median_U = median_E$ against $H_A: median_U ≠ median_E)$ may be preferred since the sample sizes (n=9) are small and the distributions are not symmetric (Figure 3). To do so, a two-way table can be constructed of Brand against whether the observations are below the overall median (which is 8.325 hours) or not. We will use Fisher’s exact test ($H_0$: The number of batteries less than the median is the same for both brands, against $H_A$:The number of batteries less than the median is not the same for both brands). This method is less effective for small samples.
+
+3. A Mann-Whitney (also known as a Wilcoxon) test could be considered ($H_0$: The distributions are the same, against $H_A$: The distributions are not the same), but may not test the hypothesis of interest unless we also assume that the distributions are the same apart from a shift in location.
+
+4. A bootstrap approach to compare the medians or means (we use a test for comparing medians in what follows) 
+
+5. A permutation test 
+
+*There are many possible approaches for the analysis of the data. Despite the chosen method, the conclusion is the same: no evidence currently exists that the Ultracell batteries have an mean time less than the Energizer batteries in reaching the 0.9 volts end-point. Choosing the type of test to use could be an important a discussion topic in a more advanced class (maybe not an introductory level statistics class). Students would benefit from identifying the pros/cons of each test and comparing them.*
+
+```{r}
+#Table 3 is produced using these commands:
+attach(batteries2)
+AllTimes <- c( Time[Voltage==0.9 & Brand=="Energizer"],
+ Time[Voltage==0.9 & Brand=="Ultracell"] )
+Groups <- c( rep("Energizer", 9), rep("Ultracell", 9) )
+xtabs(~ Groups + (AllTimes < median(AllTimes)) )
+```
+
+**Table 3.** The data from Test 2 arranged for Fisher’s exact test to compare the proportion of batteries from each Brand that exceed the overall median time (8.325 hours) to reach 0.9 volts.
+
+```{r}
+detach(batteries2)
+```
+
+
+```{r}
+#Figure 3:
+par(mfrow=c(2,3)) # Establish 2x3 grid for plots
+stripchart(Time~Brand, data=subset(batteries2, Voltage==1.3),
+ method="stack", pch=c(3,4), col=c("red","blue"), cex=1.5,
+ xlab="Time (in hours)", main="Time to reach 1.3 volts" )
+stripchart(Time~Brand, data=subset(batteries2, Voltage==1.2),
+ method="stack", col=c("red","blue"), cex=1.5, pch=c(3,4),
+ xlab="Time (in hours)", main="Time to reach 1.2 volts" )
+stripchart(Time~Brand, data=subset(batteries2, Voltage==1.1),
+ method="stack", pch=c(3,4), col=c("red","blue"), cex=1.5,
+ xlab="Time (in hours)", main="Time to reach 1.1 volts" )
+stripchart(Time~Brand, data=subset(batteries2, Voltage==1.0),
+ method="stack", pch=c(3,4), col=c("red","blue"), cex=1.5,
+ xlab="Time (in hours)", main="Time to reach 1.0 volts" )
+stripchart(Time~Brand, data=subset(batteries2, Voltage==0.9),
+ method="stack", pch=c(3,4), col=c("red","blue"), cex=1.5,
+ xlab="Time (in hours)", main="Time to reach 0.9 volts" )
+stripchart(Time~Brand, data=subset(batteries2, Voltage==0.8),
+ method="stack", pch=c(3,4), col=c("red","blue"), cex=1.5,
+ xlab="Time (in hours)", main="Time to reach 0.8 volts" )
+par(mfrow=c(1,1))
+```
+
+**Figure 3.** Dot plots of the data from Test 2, showing the non-symmetry of the distributions in many cases.
+
+##Conducting the aformentioned tests
+Note that I will discuss the results of the test once they are all conducted and put together in a nice and tidy table.
+
+Here we are conducting the t-test to test the hypothesis of no difference between the mean times to decay to 0.9 volts $(H_0: \mu_U = \mu_E)$ against the two-tailed alternative $(H_A: \mu_U ≠ \mu_E)$.
+```{r}
+#Table 4:
+# T-test for a difference at 0.9 V
+p.t <- t.test(Time ~ Brand,
+data=subset(batteries2, Voltage==0.9))
+```
+
+
+Here we conduct the Wilcoxen test (also known as the Mann-Whitney test). $H_0$: The distributions are the same, against $H_A$: The distributions are not the same.
+```{r}
+# Wilcoxon test for a difference at 0.9 V
+p.wilcox <- wilcox.test(Time ~ Brand,
+data=subset(batteries2, Voltage==0.9), conf.int=TRUE)
+```
+
+Next we conduct the non-parametric test (Fisher's exact test) for comparing the medians $(H_0: median_U = median_E$ against $H_A: median_U ≠ median_E)$ may be preferred since the sample sizes (n=9) are small and the distributions are not symmetric (Figure 3). To do so, a two-way table can be constructed of Brand against whether the observations are below the overall median (which is 8.325 hours) or not.
+```{r}
+# Median test for a difference at 0.9 V
+median.test <- function(x,y){
+ z <- c(x,y)
+ g <- rep(1:2, c(length(x),length(y)))
+ m <- median(z)
+ fisher.test(z<m,g)$p.value
+}
+p.median <- with( batteries2,
+ median.test( Time[Voltage==0.9 & Brand=="Ultracell"],
+ Time[Voltage==0.9 & Brand=="Energizer"])
+)
+```
+
+
+Here we use the bootstrap approach to compare the medians or means. We are testing: $(H_0: median_U = median_E$ against $H_A: median_U ≠ median_E)$.
+```{r}
+# Bootstrap test for a difference at 0.9 V
+med.diff <- function(dataset, ind){
+ y <- dataset$Time[ind]
+ group <- dataset$Brand[ind]
+ med.E <- median(y[group=="Energizer"]) # E
+ med.U <- median(y[group=="Ultracell"]) # U
+ return(med.E - med.U)
+}
+
+library(boot) ### LOAD THE boot LIBRARY
+out <- boot(subset(batteries2, Voltage==0.9), med.diff, R=5000)
+ci.boot <- boot.ci(out)
+p.boot <- sum(out$t >= 0)/out$R
+
+```
+
+Here we conduct a permutation test.We are testing: $(H_0: mean_U = mean_E$ against $H_A: mean_U ≠ mean_E)$.
+```{r}
+# Permutation test
+library(lmPerm) ### LOAD THE lmPerm package
+out.perm <- aovp(Time~Brand, data=subset(batteries2, Voltage==0.9))
+# If you want to display results
+#p.t
+#p.median
+#p.wilcox
+#p.boot
+#ci.boot
+#summary(out.perm)
+#confint(out.perm)
+```
+
+**Table 4.** The data from Test 2 for comparing the time for the two brands of batteries to reach the endpoint of 0.9 volts. The hypotheses are given in the text. In all cases, a positive difference means that the parameter of interest for the Energizer batteries is larger than that for the Ultracell batteries. The results for the Mann-Whitney test are approximate because of the presence of ties.
+
+| Method                     | P-value | Confidence Interval |
+|----------------------------|---------|---------------------|
+| t-test                     | 0.70    | -0.16 to 0.23       |
+| Mann-Whitney test          | 0.27    | -0.03 to 0.17       |
+| Median test                | 0.35    | NA                  |
+| Bootstrap                  | 0.89    | -0.40 to 0.10       |
+| Permutation test for means | 0.64    | -0.08 to 0.11       |
+
+
+The results of all 5 approaches are that we fail to reject the null hypothesis. ALDI claims that the Ultracell batteries outperform Energizer batteries in two tests (test 1 and 3). However, they do not mention the fact that no evidence suggests that Energizer batteries outperform Ultracell batteries in any of the three tests.
+
+*Get student input on whether they think the ALDI claim is accurate or not. Could the claim could be worded differently for marketing purposes? (for example, “There is no evidence that Energizer batteries last longer on average in any of the three standard tests”). Students could also talk about what the implications might be after making this claim if someone with very little statistical knowledge saw the results in Table 1 (in test 2 where the Energizer mean time is bigger than the Ultracell mean time). Ask how they would explain the situation to the person with little statistical knowledge.*
+
+
+##Testing in an overall sense
+*Note that the times for Energizer and Ultracell can also be compared for **all** the given voltage levels. It may actually end up being more useful to test whether one brand of battery is superior to the other in an overall sense and not just at a specific voltage.*
+
+Multiple tests suggest themselves in this scenario as well (the article notes multiple t-tests and one-way ANOVA). The code and output for fitting a repeated measures model in R is shown below:  
+
+```{r}
+#The repeated measures analyses:
+#noting that the experiment is balanced, and treating the voltage levels as factors
+t1 <- aov(Time ~ factor(Voltage)*Brand + Error(Battery),
+data = batteries2)
+summary(t1)
+model.tables(t1,"means")
+```
+
+Brand is brought to our attention in this model (note that brand depends on the voltage level). There is strong evidence suggesting that the Energizer and Ultracell are different in the overall perspective, and that the Ultracell batteries are actually superior! 
+
+```{r}
+t2 <- aov(Time ~ Voltage*Brand + Error(Battery),
+data = batteries2)
+### Assumes linear relationship between Time and Voltage
+summary(t2)
+```
+
+Note: Treating the voltage levels as factors is not necessary, but treating voltage as quantitative needs special attention because the relationship between time and voltage is non-linear. The following approach (where Voltage is not treated as a factor) is not ideal for this scenario:
+
+```
+t2 <- aov(Time ~ Voltage*Brand + Error(Battery), data = batteries2)
+```
+
+This approach finds a P-value of 0.080 for the Brand, which is quite different from the P-value when treating the voltage as a factor
+
+Another to determine which brand of battery is better in a more general sense is to think about how voltage decays with respect to time, and compare these decay rates for Energizer and Ultracell. The exponential decay model is a simplistic representation of this decay: $V(t) = V_0 \exp(\frac{t}{k})$, where k (< 0) is the decay constant for the battery brand, $V(t)$ is the voltage at time t, and $V_0$ is the voltage at time zero. The relationship between ln(V(t)) and t should be linear using the exponential decay model, but the plot of this relationship does not actually appear to be linear over the whole range of the data (Figure 4). Thus we may conclude that the data does not follow an exponential decay model.
+
+```{r}
+#Figure 4:
+offset <- c(0.01, -0.01)
+logV <- log(batteries2$Voltage +
+ jitter(ifelse(batteries2$Brand=="Energizer", offset[1], offset[2]),
+ amount=0.01)) +
+ ifelse(batteries2$Brand=="Energizer", offset[1], offset[2])
+plot(logV~batteries2$Time,
+ main="Test 2",
+ pch=ifelse(Brand=="Energizer",3,4),
+ col=ifelse(Brand=="Energizer","red","blue"),
+ xlab="Time (in hours)", ylab="Log of Voltage",
+ las=1,
+ data=batteries2
+)
+grid()
+abline(h=log(0.9), col="gray")
+legend("topright",pch=c(3,4), col=c("red","blue"),
+legend=c("Energizer","Ultracell"), bty="n")
+```
+
+**Figure 4:** The natural logarithm of voltage plotted against time for the data from Test 2. The data from the two brands have been shifted slightly and jittered in the vertical direction to avoid overplotting. The solid, gray horizontal line corresponds to the standard end-point for the test: 0.9 volts.
+
+```{r}
+sessionInfo()
+```
